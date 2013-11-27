@@ -21,6 +21,7 @@
 #include "Plane.h"
 #include "Source.h"
 #include "Cylinder.h"
+#include "Triangle.h"
 
 
 using namespace std;
@@ -276,8 +277,9 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
 					if (secondary_intersections.at(c)<= distance_to_light_magnitude)
 					{
 						shadowed = true;
+						break;
 					}
-					break;
+
 				}
 			}
 			if (shadowed == false)
@@ -308,6 +310,55 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
 	return final_color.clip();
 
 }
+
+vector<Object*> scene_objects;
+void makeCube(Vect corner1, Vect corner2, Color color)
+{
+	double c1x = corner1.getVectX();
+	double c1y = corner1.getVectY();
+	double c1z = corner1.getVectZ();
+
+	double c2x = corner2.getVectX();
+	double c2y = corner2.getVectY();
+	double c2z = corner2.getVectZ();
+
+	Vect A(c2x, c1y, c1z);
+	Vect B(c2x, c1y, c2z);
+	Vect C(c1x, c1y, c2z);
+
+	Vect D(c2x, c2y, c1z);
+	Vect E(c1x, c2y, c1z);
+	Vect F(c1x, c2y, c2z);
+
+	//crear caras
+	//Lado izquierdo
+	scene_objects.push_back(new Triangle(D, A, corner1, color));
+	scene_objects.push_back(new Triangle(corner1, E, D, color));
+
+	//lado del fondo
+	scene_objects.push_back(new Triangle(corner2, B, A, color));
+	scene_objects.push_back(new Triangle(D, A, corner1, color));
+
+	//lado derecho
+	scene_objects.push_back(new Triangle(F, C, B, color));
+	scene_objects.push_back(new Triangle(B, corner2, F, color));
+
+	//lado frontal
+	scene_objects.push_back(new Triangle(E, corner1, C, color));
+	scene_objects.push_back(new Triangle(C, F, E, color));
+
+	//top
+	scene_objects.push_back(new Triangle(D, E, F, color));
+	scene_objects.push_back(new Triangle(F, corner2, D, color));
+
+	//botoom
+	scene_objects.push_back(new Triangle(corner1, A, B, color));
+	scene_objects.push_back(new Triangle(B, C, corner1, color));
+	
+
+
+}
+
 
 int main(array<System::String ^> ^args)
 {
@@ -341,7 +392,7 @@ int main(array<System::String ^> ^args)
 	//prof
 	Vect Z(0, 0, 1);
 
-	Vect new_sphere_location(2, 2, 0);
+	Vect new_sphere_location(1.75, 0.25, 0);
 	//creando una camara
 	//------------------------------------------------------------------
 	// tenemos que definir todas sus coordenadas que vamos a usar 
@@ -367,6 +418,7 @@ int main(array<System::String ^> ^args)
 	Color tile_floor(1, 1, 1, 2);
 	Color gray(0.5, 0.5, 0.5, 0);
 	Color black(0.0, 0.0, 0.0, 0);
+	Color orange(0.94, 0.75, 0.31, 0);
 	// posicion de la luz , creamos el vector
 
 	Vect light_position(-7, 10, -10);
@@ -375,16 +427,18 @@ int main(array<System::String ^> ^args)
 	light_sources.push_back(dynamic_cast<Source*>(&scene_light));
 
 	// objetos de la escena
-	Sphere scene_sphere(O, 1, pretty_green);
-	Sphere scene_sphere2(new_sphere_location, 0.5, maroon);
+	Sphere scene_sphere(Vect(0,0,-2), 1, pretty_green);
+	Sphere scene_sphere2(Vect(2,-0.5,1), 0.5, maroon);
 	Cylinder cylinder1(Vect(0, 0.5, -2), .5, 0.5, maroon);
 	Plane scene_plane(Y, -1, tile_floor);
+	Triangle tri1(Vect(3, 0, 0), Vect(0, 3, 0), Vect(0, 0, 3), orange);
 	// vector que contiene a los objetos de la escena
-	vector<Object*> scene_objects;
-	//scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere));
-	//scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere2));
+	makeCube(Vect(1,1,1), Vect(-1,-1,-1), orange);
+	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere));
+	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere2));
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
-	scene_objects.push_back(dynamic_cast<Object*>(&cylinder1));
+	//scene_objects.push_back(dynamic_cast<Object*>(&tri1));
+	//scene_objects.push_back(dynamic_cast<Object*>(&cylinder1));
 
 	int thisone, aa_index;
 	//valores que van a hacer que se vaya ligeramente a la derecha o a la izquierda
