@@ -21,13 +21,30 @@ public:
 	// metodos
 	Vect getPlaneNormal(){ return normal; }
 	double getPlaneDistance(){ return distance; }
-	Color getPlaneColor(){ return color; }
-
-	
-	Vect getNormalAt( Vect point )
+	virtual Color getColor(){ return color; }
+	virtual Vect getNormalAt( Vect point )
 	{
 		// no importa donde intercepte siempre va a ser la misma normal al punto x
 		return normal;
+	}
+
+	virtual double findIntersection(Ray ray)
+	{
+		Vect ray_direction = ray.getRayDirection();
+
+		double a = ray_direction.dotProduct(normal);
+		if (a == 0)
+		{
+			// el rayo es paralelo al plano
+			return -1;
+		}
+		else
+		{
+			// producto punto (normal (°) origen.rayo-(distancia*normal))
+			double b = normal.dotProduct(ray.getRayOrigin().vectAdd(normal.vectMult(distance).negative()));
+			//distancia entre el rayo de origen por la interseccion
+			return -1 * b / a;
+		}
 	}
 
 };

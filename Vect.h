@@ -13,6 +13,9 @@ public:
 	double getVectX(){ return x; }
 	double getVectY(){ return y; }
 	double getVectZ(){ return z; }
+	double setVectX(double dx){ return x; }
+	double setVectY(double dy){ return y; }
+	double setVectZ(double dz){ return z; }
 
 	double magnitude()
 	{
@@ -45,7 +48,7 @@ public:
 		return Vect(x + v.getVectX(), y + v.getVectY(), z + v.getVectZ());
 	}
 
-	Vect vecMult(double scalar)
+	Vect vectMult(double scalar)
 	{
 		return Vect(x* scalar,y*scalar,z*scalar);
 	}
